@@ -146,6 +146,12 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (!capturedImage && videoRef.current && stream) {
+      videoRef.current.srcObject = stream
+    }
+  }, [capturedImage, stream])
+
+  useEffect(() => {
     if (!videoRef.current || capturedImage) return
     const video = videoRef.current
     const canvas = overlayCanvasRef.current
