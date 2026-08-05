@@ -8,12 +8,14 @@
 }
 
 .camera-container {
-  flex: 1;
   position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .camera-video {
@@ -121,8 +123,8 @@
 }
 
 .preview-image {
-  max-width: 100%;
-  max-height: calc(100svh - 120px);
+  width: 100%;
+  aspect-ratio: 1 / 1;
   object-fit: contain;
   border-radius: 8px;
 }

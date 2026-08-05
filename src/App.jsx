@@ -186,15 +186,21 @@ function App() {
     const canvas = canvasRef.current
     if (!video || !canvas) return
 
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
+    const vw = video.videoWidth
+    const vh = video.videoHeight
+    const size = Math.min(vw, vh)
+    const sx = (vw - size) / 2
+    const sy = (vh - size) / 2
+
+    canvas.width = size
+    canvas.height = size
     const ctx = canvas.getContext('2d')
 
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+    ctx.drawImage(video, sx, sy, size, size, 0, 0, size, size)
 
     const frame = FRAMES.find(f => f.id === selectedFrame)
     if (frame && frame.render) {
-      frame.render(ctx, canvas.width, canvas.height)
+      frame.render(ctx, size, size)
     }
 
     const dataUrl = canvas.toDataURL('image/png')
