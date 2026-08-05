@@ -17,6 +17,7 @@ function App() {
   const [facingMode, setFacingMode] = useState('environment')
   const [error, setError] = useState(null)
   const [frameImages, setFrameImages] = useState({})
+  const [toast, setToast] = useState(false)
 
   useEffect(() => {
     FRAMES.forEach(frame => {
@@ -101,6 +102,9 @@ function App() {
     link.download = `frame-photo-${Date.now()}.png`
     link.href = capturedImage
     link.click()
+    setCapturedImage(null)
+    setToast(true)
+    setTimeout(() => setToast(false), 2500)
   }
 
   const retake = () => {
@@ -173,6 +177,7 @@ function App() {
       )}
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
+      {toast && <div className="toast">保存しました！</div>}
     </div>
   )
 }
