@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
+  <!-- Outer gold border -->
+  <rect x="10" y="10" width="980" height="980" rx="8" stroke="#DAA520" stroke-width="30"/>
+  <!-- Inner gold border -->
+  <rect x="40" y="40" width="920" height="920" rx="4" stroke="#B8860B" stroke-width="8"/>
+  <!-- Corner ornaments -->
+  <circle cx="50" cy="50" r="18" fill="#DAA520"/>
+  <circle cx="950" cy="50" r="18" fill="#DAA520"/>
+  <circle cx="50" cy="950" r="18" fill="#DAA520"/>
+  <circle cx="950" cy="950" r="18" fill="#DAA520"/>
+  <!-- Decorative dots along edges -->
+  <circle cx="500" cy="18" r="8" fill="#B8860B"/>
+  <circle cx="250" cy="18" r="6" fill="#B8860B"/>
+  <circle cx="750" cy="18" r="6" fill="#B8860B"/>
+  <circle cx="500" cy="982" r="8" fill="#B8860B"/>
+  <circle cx="250" cy="982" r="6" fill="#B8860B"/>
+  <circle cx="750" cy="982" r="6" fill="#B8860B"/>
+  <circle cx="18" cy="500" r="8" fill="#B8860B"/>
+  <circle cx="18" cy="250" r="6" fill="#B8860B"/>
+  <circle cx="18" cy="750" r="6" fill="#B8860B"/>
+  <circle cx="982" cy="500" r="8" fill="#B8860B"/>
+  <circle cx="982" cy="250" r="6" fill="#B8860B"/>
+  <circle cx="982" cy="750" r="6" fill="#B8860B"/>
+</svg>

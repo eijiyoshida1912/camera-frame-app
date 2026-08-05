@@ -2,120 +2,32 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import './App.css'
 
 const FRAMES = [
-  { id: 'none', name: 'なし', render: () => null },
-  {
-    id: 'polaroid',
-    name: 'ポラロイド',
-    render: (ctx, w, h) => {
-      const border = Math.min(w, h) * 0.06
-      const bottom = Math.min(w, h) * 0.18
-      ctx.fillStyle = '#ffffff'
-      ctx.fillRect(0, 0, w, border)
-      ctx.fillRect(0, 0, border, h)
-      ctx.fillRect(w - border, 0, border, h)
-      ctx.fillRect(0, h - bottom, w, bottom)
-      ctx.strokeStyle = '#e0e0e0'
-      ctx.lineWidth = 2
-      ctx.strokeRect(border / 2, border / 2, w - border, h - bottom + border / 2)
-    }
-  },
-  {
-    id: 'vintage',
-    name: 'ヴィンテージ',
-    render: (ctx, w, h) => {
-      const border = Math.min(w, h) * 0.05
-      ctx.strokeStyle = '#8B4513'
-      ctx.lineWidth = border
-      ctx.strokeRect(border / 2, border / 2, w - border, h - border)
-      ctx.strokeStyle = '#D2691E'
-      ctx.lineWidth = border * 0.4
-      ctx.strokeRect(border * 0.8, border * 0.8, w - border * 1.6, h - border * 1.6)
-      const corner = border * 2
-      ctx.fillStyle = '#8B4513'
-      drawCornerOrnament(ctx, 0, 0, corner, 1, 1)
-      drawCornerOrnament(ctx, w, 0, corner, -1, 1)
-      drawCornerOrnament(ctx, 0, h, corner, 1, -1)
-      drawCornerOrnament(ctx, w, h, corner, -1, -1)
-    }
-  },
-  {
-    id: 'neon',
-    name: 'ネオン',
-    render: (ctx, w, h) => {
-      const border = Math.min(w, h) * 0.04
-      const colors = ['#ff00ff', '#00ffff', '#ff00ff']
-      colors.forEach((color, i) => {
-        ctx.shadowColor = color
-        ctx.shadowBlur = 15
-        ctx.strokeStyle = color
-        ctx.lineWidth = border * 0.3
-        const offset = border * 0.4 * i + border * 0.2
-        ctx.strokeRect(offset, offset, w - offset * 2, h - offset * 2)
-      })
-      ctx.shadowBlur = 0
-    }
-  },
-  {
-    id: 'flower',
-    name: '花柄',
-    render: (ctx, w, h) => {
-      const border = Math.min(w, h) * 0.07
-      ctx.fillStyle = '#fce4ec'
-      ctx.fillRect(0, 0, w, border)
-      ctx.fillRect(0, 0, border, h)
-      ctx.fillRect(w - border, 0, border, h)
-      ctx.fillRect(0, h - border, w, border)
-      const flowerSize = border * 0.5
-      const spacing = flowerSize * 2
-      for (let x = spacing; x < w - spacing; x += spacing) {
-        drawFlower(ctx, x, border / 2, flowerSize)
-        drawFlower(ctx, x, h - border / 2, flowerSize)
-      }
-      for (let y = spacing; y < h - spacing; y += spacing) {
-        drawFlower(ctx, border / 2, y, flowerSize)
-        drawFlower(ctx, w - border / 2, y, flowerSize)
-      }
-    }
-  },
+  { id: 'none', name: 'なし', src: null },
+  { id: 'gold', name: 'ゴールド', src: '/frames/gold.svg' },
+  { id: 'hearts', name: 'ハート', src: '/frames/hearts.svg' },
+  { id: 'starry', name: '星空', src: '/frames/starry.svg' },
 ]
-
-function drawCornerOrnament(ctx, x, y, size, dx, dy) {
-  ctx.beginPath()
-  ctx.moveTo(x, y)
-  ctx.lineTo(x + size * dx, y)
-  ctx.lineTo(x + size * dx * 0.7, y + size * dy * 0.3)
-  ctx.lineTo(x + size * dx * 0.3, y + size * dy * 0.7)
-  ctx.lineTo(x, y + size * dy)
-  ctx.closePath()
-  ctx.fill()
-}
-
-function drawFlower(ctx, x, y, size) {
-  const petals = 5
-  ctx.fillStyle = '#f48fb1'
-  for (let i = 0; i < petals; i++) {
-    const angle = (i * 2 * Math.PI) / petals
-    const px = x + Math.cos(angle) * size * 0.4
-    const py = y + Math.sin(angle) * size * 0.4
-    ctx.beginPath()
-    ctx.arc(px, py, size * 0.25, 0, Math.PI * 2)
-    ctx.fill()
-  }
-  ctx.fillStyle = '#ffeb3b'
-  ctx.beginPath()
-  ctx.arc(x, y, size * 0.15, 0, Math.PI * 2)
-  ctx.fill()
-}
 
 function App() {
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
-  const overlayCanvasRef = useRef(null)
   const [stream, setStream] = useState(null)
   const [selectedFrame, setSelectedFrame] = useState('none')
   const [capturedImage, setCapturedImage] = useState(null)
   const [facingMode, setFacingMode] = useState('environment')
   const [error, setError] = useState(null)
+  const [frameImages, setFrameImages] = useState({})
+
+  useEffect(() => {
+    FRAMES.forEach(frame => {
+      if (!frame.src) return
+      const img = new Image()
+      img.src = frame.src
+      img.onload = () => {
+        setFrameImages(prev => ({ ...prev, [frame.id]: img }))
+      }
+    })
+  }, [])
 
   const startCamera = useCallback(async (facing) => {
     if (stream) {
@@ -151,30 +63,6 @@ function App() {
     }
   }, [capturedImage, stream])
 
-  useEffect(() => {
-    if (!videoRef.current || capturedImage) return
-    const video = videoRef.current
-    const canvas = overlayCanvasRef.current
-    if (!canvas) return
-
-    let animId
-    const drawOverlay = () => {
-      if (video.videoWidth && video.videoHeight) {
-        canvas.width = video.clientWidth
-        canvas.height = video.clientHeight
-        const ctx = canvas.getContext('2d')
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        const frame = FRAMES.find(f => f.id === selectedFrame)
-        if (frame && frame.render) {
-          frame.render(ctx, canvas.width, canvas.height)
-        }
-      }
-      animId = requestAnimationFrame(drawOverlay)
-    }
-    drawOverlay()
-    return () => cancelAnimationFrame(animId)
-  }, [selectedFrame, capturedImage])
-
   const switchCamera = () => {
     const newFacing = facingMode === 'environment' ? 'user' : 'environment'
     setFacingMode(newFacing)
@@ -198,9 +86,9 @@ function App() {
 
     ctx.drawImage(video, sx, sy, size, size, 0, 0, size, size)
 
-    const frame = FRAMES.find(f => f.id === selectedFrame)
-    if (frame && frame.render) {
-      frame.render(ctx, size, size)
+    const frameImg = frameImages[selectedFrame]
+    if (frameImg) {
+      ctx.drawImage(frameImg, 0, 0, size, size)
     }
 
     const dataUrl = canvas.toDataURL('image/png')
@@ -218,6 +106,8 @@ function App() {
   const retake = () => {
     setCapturedImage(null)
   }
+
+  const currentFrame = FRAMES.find(f => f.id === selectedFrame)
 
   if (error) {
     return (
@@ -242,7 +132,9 @@ function App() {
               muted
               className="camera-video"
             />
-            <canvas ref={overlayCanvasRef} className="overlay-canvas" />
+            {currentFrame?.src && (
+              <img src={currentFrame.src} alt="" className="frame-overlay" />
+            )}
           </div>
 
           <div className="frame-selector">
