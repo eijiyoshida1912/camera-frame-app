@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import liff from "@line/liff";
 import "./App.css";
 
 const FRAMES = [
@@ -113,6 +114,28 @@ function App() {
     setTimeout(() => setToast(false), 2500);
   };
 
+  const shareToLine = async () => {
+    if (!capturedImage) return;
+    if (!liff.isInClient() && !liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
+    try {
+      await liff.shareTargetPicker([
+        {
+          type: "image",
+          originalContentUrl: capturedImage,
+          previewImageUrl: capturedImage,
+        },
+      ]);
+      setCapturedImage(null);
+      setToast(true);
+      setTimeout(() => setToast(false), 2500);
+    } catch {
+      alert("送信できませんでした。もう一度お試しください。");
+    }
+  };
+
   const retake = () => {
     setCapturedImage(null);
   };
@@ -189,6 +212,11 @@ function App() {
             <button className="action-btn download-btn" onClick={downloadPhoto}>
               保存
             </button>
+            {liff.isInClient() && (
+              <button className="action-btn line-btn" onClick={shareToLine}>
+                LINEで送る
+              </button>
+            )}
           </div>
         </div>
       )}

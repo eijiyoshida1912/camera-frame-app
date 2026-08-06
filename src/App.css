@@ -159,6 +159,11 @@
   color: #000;
 }
 
+.line-btn {
+  background: #06C755;
+  color: #fff;
+}
+
 .error-screen {
   flex: 1;
   display: flex;
