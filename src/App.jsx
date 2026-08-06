@@ -46,6 +46,7 @@ function App() {
         }
         setError(null);
       } catch (err) {
+        alert(err);
         setError(
           "カメラへのアクセスが許可されていません。設定を確認してください。",
         );
